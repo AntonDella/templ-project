@@ -25,14 +25,23 @@ This project aims to apply and extend your Ansible skills by automating server s
 3. Synchronize files using Unison. Designate one VM as passive (central sync point) and the other two as active. Sync directory: `/boxydrop`.
 4. Run Unison under the `sync2` user, ensuring it has the necessary directory permissions.
 5. Schedule Unison with cron to run every minute.
-6. Define machine roles (passive vs. active) using Ansible groups, roles, or inventory variables—no hard-coded hostnames.
-7. Ensure `ansible-lint` passes without errors.
+6. Define machine roles (passive vs. active) using Ansible groups, [roles](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html), or inventory variables—no hard-coded hostnames.
+7. Ensure `ansible-lint` passes without errors. The error it shows for `state: latest` in the package update task may be ignored using a `noqa`-comment at the end of the offending line. Example:
+
+```yaml
+- name: Update cache and all packages
+  ansible.builtin.apt:
+  update_cache: true
+  name: "*"
+  state: latest # noqa: package-latest
+```
 
 ### Advanced Requirements (Väl Godkänt)
 
 8. Structure your Ansible playbook into at least two plays, maintaining a single playbook.
-9. Install and configure Docker on one of the hosts using Ansible. Specify the host with a role.
-10. Deploy a Docker container that can add files to `/boxydrop`. Ensure external accessibility and configurability for file addition.
+9. Install and configure Docker on one of the hosts using Ansible. Specify the host with a [role](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html)
+10. Deploy a Docker container (containing any software of your choice) that can let the user add files to `/boxydrop` using a web interface.
+11. Adjust and assert that the permissions on `/boxydrop` makes it possible for the Unison replication to keep working while also allowing the Docker container software to add files.
 
 **Software examples for Docker deployment:**
 
@@ -44,7 +53,7 @@ This project aims to apply and extend your Ansible skills by automating server s
 - Ansible
 - Unison
 - `ansible-lint`
-- Docker (for Advanced Requirements for VG)
+- Docker (for Advanced Requirements for Väl Godkänt)
 
 ## Submission Guidelines
 
@@ -53,12 +62,15 @@ This project aims to apply and extend your Ansible skills by automating server s
 3. **Checks**:
    1. Include all relevant files in your repository such as playbooks, inventory, roles, etc.
    2. SSH into all nodes, navigate to `/boxydrop`, and execute
+   ```bash
       while true; do sleep 15; date; ls; done
+   ```
    3. Upload a file to an active machine and capture a screenshot showing the file's propagation.
-   4. Show a screenshot of `ansible-lint` yourplaybook.yml with no errors
+   4. Show a screenshot of `ansible-lint yourplaybook.yml` with no errors
    5. **Advanced Requirements**: Include a screenshot of the Docker-deployed software with uploaded files visible in a web browser.
 
-## Resources\
+## Resources
+
 - [Unison File Synchronizer Tutorials](https://www.youtube.com/results?search_query=unison+file+synchronizer)
 - [Crontab in Ubuntu](https://www.youtube.com/results?search_query=crontab+ubuntu)
 - [Ansible-Lint Documentation](https://ansible.readthedocs.io/projects/lint/)
